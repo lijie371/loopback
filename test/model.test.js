@@ -742,6 +742,36 @@ describe.onServer('Remote Methods', function() {
 
       expect(callbackSpy).to.have.been.calledWith(TestModel.sharedClass, 'findOne');
     });
+
+    describe('batch operations', function() {
+      var app;
+      before(function() {
+        app = loopback();
+        app.use(loopback.rest());
+        var model = PersistedModel.extend('Toy', {
+          name: String,
+        });
+        app.dataSource('db', { connector: 'memory' });
+        app.model(model, { dataSource: 'db' });
+      });
+
+      it('should support batch `create`', function(done) {
+        request(app)
+          .post('/toys')
+          .send([{ name: 'Car' }, { name: 'Truck' }])
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) return done(err);
+            var expected = [
+              { id: 1, name: 'Car' },
+              { id: 2, name: 'Truck' },
+            ];
+            expect(res.body).to.eql(expected);
+            done();
+          });
+      });
+    });
   });
 
   describe('Model.getApp(cb)', function() {
