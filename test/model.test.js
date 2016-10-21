@@ -755,10 +755,11 @@ describe.onServer('Remote Methods', function() {
         app.model(model, { dataSource: 'db' });
       });
 
-      it('should support batch `create`', function(done) {
+      it('creates array of objects', function(done) {
+        var arrayOfObjects = [{ name: 'Car' }, { name: 'Truck' }];
         request(app)
           .post('/toys')
-          .send([{ name: 'Car' }, { name: 'Truck' }])
+          .send(arrayOfObjects)
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err, res) {
